@@ -32,7 +32,7 @@ export const loginPartner = async (req: Request, res: Response) => {
         return res.status(403).json({ message: "Your account has been deactivated" });
     }
 
-    const isMatch = bcrypt.compare(password, partner.password)
+    const isMatch = await bcrypt.compare(password, partner.password)
     if (!isMatch) {
         return res.status(401).json({ message: "Invalid email or password" })
     }

@@ -16,7 +16,6 @@ export const getAdminStats = async (req: Request, res: Response) => {
             prisma.product.count(),
             prisma.product.count({ where: { stock: 0 } }),
             prisma.deliveryPartner.count(),
-            prisma.order.count(),
             prisma.order.findMany({
                 where: { NOT: [{ paymentMethod: "card", isPaid: false }] },
                 orderBy: { createdAt: "desc" },
@@ -70,7 +69,7 @@ export const updateDeliveryPartner = async (req: Request, res: Response) => {
     if (name) data.name = name;
     if (phone) data.phone = phone;
     if (vehicleType) data.vehicleType = vehicleType;
-    if (isActive) data.isActive = isActive;
+    data.isActive = isActive;
 
     try {
         const partner = await prisma.deliveryPartner.update({
@@ -103,7 +102,7 @@ export const assignDeliveryPartner = async (req: Request, res: Response) => {
     const history: any[] = Array.isArray(order!.statusHistory) ? order!.statusHistory : [];
 
     if (order!.status === "Placed" || order?.status === "Confirmed") {
-        status: "Assigned";
+        status = "Assigned";
         history.push({
             status: "Assigned",
             note: `Assigned to ${partner!.name}`, timestamp: new Date()

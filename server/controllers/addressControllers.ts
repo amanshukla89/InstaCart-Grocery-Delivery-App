@@ -55,7 +55,7 @@ export const addAddress = async (req: Request, res: Response) => {
         orderBy: { createdAt: "asc" }
     })
 
-    res.status(201).json({ addAddress })
+    res.status(201).json({ addresses })
 }
 
 //Update address
@@ -98,7 +98,9 @@ export const updateAddress = async (req: Request, res: Response) => {
         where: { userId: req.user!.id },
         orderBy: { createdAt: "asc" }
     })
+    res.status(200).json({ addresses })
 }
+
 
 //Delete address
 //DELETE / api/address/:id
@@ -115,4 +117,5 @@ export const deleteAddress = async (req: Request, res: Response) => {
         where: { userId: req.user!.id },
         orderBy: { createdAt: "asc" }
     })
+    res.status(200).json({ addresses })
 }

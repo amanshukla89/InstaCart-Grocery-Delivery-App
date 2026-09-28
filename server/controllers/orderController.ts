@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import { timeStamp } from "node:console";
 import { inngest } from "../inngest/index.js";
+import Stripe from 'stripe';
 
 
 //Create order
@@ -38,7 +38,7 @@ export const createOrder = async (req: Request, res: Response) => {
             name: dbProduct.name,
             image: dbProduct.image,
             price: dbProduct.price,
-            quatity: item.quantity,
+            quantity: item.quantity,
             unit: dbProduct.unit,
         }
     })
@@ -63,10 +63,32 @@ export const createOrder = async (req: Request, res: Response) => {
     })
 
     if (paymentMethod === "card") {
-        //stripe payment link
-    }
 
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+
+        //create session
+        const session = await stripe.checkout.sessions.create({
+            success_url: `${req.headers.origin}/orders?clearCart = true`,
+            cancel_url: `${req.headers.origin}/checkout`,
+            line_items: [
+                {
+                    price_data: {
+                        currency: "usd",
+                        product_data: {
+                            name: "Payment Groceries"
+                        },
+                        unit_amount: Math.round(total * 100)
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            metadata: { orderId: order.id }
+        });
+        return res.json({ url: session.url })
+    }
     res.json({ order })
+
 
     //Decrease Stock
     for (const item of orderItems) {
@@ -120,7 +142,7 @@ export const getOrder = async (req: Request, res: Response) => {
     })
 
     if (!order) {
-        return res.status(404).json({ message: "Order not foound" });
+        return res.status(404).json({ message: "Order not found" });
     }
 
     res.json({ order })
@@ -138,7 +160,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []) as any[];
-    history.push({ status, note: note || `Order ${status.toLowerCase()}`, timeStamp: new Date() })
+    history.push({ status, note: note || `Order ${status.toLowerCase()}`, timestamp: new Date() })
 
     const updatedOrder = await prisma.order.update({
         where: { id: req.params.id as string },

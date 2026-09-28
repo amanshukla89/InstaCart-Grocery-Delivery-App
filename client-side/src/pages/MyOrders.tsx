@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import type { Order } from "../types";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
+import { statusColors } from "../assets/assets";
 import Loading from "../components/Loading";
 import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 
 const MyOrders = () => {
@@ -21,8 +23,16 @@ const MyOrders = () => {
     const { clearCart } = useCart()
 
     const fetchOrders = async () => {
-        setOrders(dummyDashboardOrdersData as any)
-        setLoading(false)
+        setLoading(true)
+        try {
+            const params = activeTab !== "all" ? `?status=${activeTab}` : "";
+            const { data } = await api.get(`/orders${params}`)
+            setOrders(data.orders)
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || error?.message);
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -35,7 +45,7 @@ const MyOrders = () => {
         } else {
             fetchOrders()
         }
-        setLoading(false)
+
     }, [activeTab])
 
     return (
@@ -68,21 +78,21 @@ const MyOrders = () => {
                         <p className="text-sm text-app-text-light mb-4">
                             Start shopping to see you orders here
                         </p>
-                        <Link to="/products" className="inline-flex px-4 py-4 py-2 bg-app-green text-white text-sm rounded-lg">
+                        <Link to="/products" className="inline-flex px-4 py-2 bg-app-green text-white text-sm rounded-lg">
                             Start Shopping
                         </Link>
                     </div>
                 ) : (
                     <div className="space-y-4">
                         {orders.map((order) => (
-                            <Link key={order._id} to={`/orders/${order._id}`} className="block max-w-4xl bg-white rounded-2xl p-5
+                            <Link key={order.id} to={`/orders/${order.id}`} className="block max-w-4xl bg-white rounded-2xl p-5
                             hover:shadow transition-all">
                                 {/* order id,date,& status */}
                                 <div className="flex items-start justify-between mb-3">
                                     {/* left */}
                                     <div>
                                         <p className="text-sm font-medium text-app-green">
-                                            Order #{order._id.slice(-8).toUpperCase()}
+                                            Order #{order.id.slice(-8).toUpperCase()}
                                         </p>
                                         <div className="flex items-center gap-2 mt-1">
                                             <CalendarIcon className="size-3 text-app-text-light" />
@@ -106,7 +116,7 @@ const MyOrders = () => {
                                     </div>
                                 </div>
                                 {/* Item thumbnails */}
-                                <div className="flex -tems-center gap-2 mb-3">
+                                <div className="flex items-center gap-2 mb-3">
                                     {order.items.slice(0, 4).map((item, i) => (
                                         <img key={i} src={item.image} alt={item.name}
                                             className="size-12 sm:size-16 rounded-lg object-cover border-app-border" />
@@ -126,7 +136,7 @@ const MyOrders = () => {
                                     </span>
 
                                     <span className="font-semibold text-app-green">
-                                        {currency}{order.total.toFixed(2)}
+                                        {order.total != null ? `${currency}${order.total.toFixed(2)}` : "—"}
                                     </span>
                                 </div>
                             </Link>
