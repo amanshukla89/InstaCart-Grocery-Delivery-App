@@ -111,23 +111,61 @@ export const createOrder = async (req: Request, res: Response) => {
 
 // Get user's orders
 // GET /api/orders
+// export const getUserOrder = async (req: Request, res: Response) => {
+//     const { status } = req.query;
+
+//     const where: any = {
+//         userId: req.user!.id,
+//         NOT: [{ paymentMethod: "card", isPaid: false }]
+//     }
+
+//     if (status && status !== "all") {
+//         where.status = status;
+//     }
+
+//     const orders = await prisma.order.findMany({
+//         where,
+//         include: { deliveryPartner: { select: { name: true, phone: true } } },
+//         orderBy: { createdAt: "desc" },
+//     })
+
+//     res.json({ orders })
+// }
+
 export const getUserOrder = async (req: Request, res: Response) => {
     const { status } = req.query;
+
+    console.log("========== GET USER ORDERS ==========");
+    console.log("Logged in user:", req.user!.id);
 
     const where: any = {
         userId: req.user!.id,
         NOT: [{ paymentMethod: "card", isPaid: false }]
     }
 
-    if (status && status! == "all") {
+    if (status && status !== "all") {
         where.status = status;
     }
 
+    console.log("Order query:", where);
+
     const orders = await prisma.order.findMany({
         where,
-        include: { deliveryPartner: { select: { name: true, phone: true } } },
-        orderBy: { createdAt: "desc" },
-    })
+        include: {
+            deliveryPartner: {
+                select: {
+                    name: true,
+                    phone: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+    });
+
+    console.log("Orders found:", orders);
+    console.log("Orders count:", orders.length);
 
     res.json({ orders })
 }
@@ -156,7 +194,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     const order = await prisma.order.findUnique({ where: { id: req.params.id as string } })
 
     if (!order) {
-        return res.json(404).json({ message: "Order not found" })
+        return res.status(404).json({ message: "Order not found" })
     }
 
     const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []) as any[];
