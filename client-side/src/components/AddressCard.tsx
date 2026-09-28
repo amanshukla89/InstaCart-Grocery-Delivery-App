@@ -2,7 +2,7 @@
 import { CheckIcon, MapPinIcon, PencilIcon, TrashIcon } from "lucide-react";
 import type { Address } from "../types"
 import api from "../config/api";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 interface AddressCardProps {

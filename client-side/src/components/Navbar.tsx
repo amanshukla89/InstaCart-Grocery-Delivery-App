@@ -2,7 +2,7 @@ import { ArrowUpRightIcon, BikeIcon, ChevronDownIcon, LogOutIcon, MapPinIcon, Me
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 
 
 const Navbar = () => {
