@@ -25,7 +25,7 @@ export const getProducts = async (req: Request, res: Response) => {
     if (category && category !== "all") where.category = category as string;
 
     if (organic) {
-        where.organic = organic === "true";
+        where.isOrganic = organic === "true";
     }
     if (search) where.name = { contains: search as string, mode: "insensitive" };
     if (minPrice || maxPrice) {

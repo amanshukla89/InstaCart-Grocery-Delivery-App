@@ -122,7 +122,7 @@ const Products = () => {
                                         className="appearance-none pl-3 pr-3 py-2 text-sm bg-white rounded-xl border
                                         border-app-border focus:border-app-green outline-none cursor-pointer">
                                         <option value="">Newest</option>
-                                        <option value="price-low">Price Low -- High</option>
+                                        <option value="price-low">Price :Low -- High</option>
                                         <option value="price-high">Price:High -- Low</option>
                                         <option value="rating">Top Rated</option>
                                         <option value="name">A to Z</option>
