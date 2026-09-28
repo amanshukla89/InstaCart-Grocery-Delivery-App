@@ -23,29 +23,31 @@ const Products = () => {
     const page = searchParams.get("page") || 1;
     const minPrice = searchParams.get("minPrice") || "";
     const maxPrice = searchParams.get("maxPrice") || "";
-
     const fetchProducts = async () => {
         setLoading(true);
+
         try {
-            const params = new URLSearchParams()
-            if (category) params.set('category', category)
-            if (organic) params.set('organic', organic)
-            if (sort) params.set('category', sort)
-            if (sort) params.set('category', sort)
-            if (maxPrice) params.set('category', maxPrice)
-            params.set("page", String(page))
-            params.set("limit", "12")
+            const params = new URLSearchParams();
+
+            if (category) params.set("category", category);
+            if (organic) params.set("organic", organic);
+            if (sort) params.set("sort", sort);
+            if (minPrice) params.set("minPrice", minPrice);
+            if (maxPrice) params.set("maxPrice", maxPrice);
+
+            params.set("page", String(page));
+            params.set("limit", "12");
 
             const { data } = await api.get(`/products?${params.toString()}`);
-            setProducts(data.products)
-            setTotalPages(data.pages)
+
+            setProducts(data.products);
+            setTotalPages(data.pages);
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || error?.message)
+            toast.error(error?.response?.data?.message || error?.message);
+        } finally {
+            setLoading(false);
         }
-        finally {
-            setLoading(false)
-        }
-    };
+    };;
 
     const updateFilter = (key: string, value: string) => {
         const newParams = new URLSearchParams(searchParams);
