@@ -135,7 +135,7 @@ const Checkout = () => {
                         {step === "payment" && <CheckoutPayment paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} setStep={setStep}
                         />}
 
-                        {step === "review" && <CheckoutReview address={address} items={items} handlePlaceOrder={handlePlaceholder}
+                        {step === "review" && address && <CheckoutReview address={address} items={items} handlePlaceOrder={handlePlaceholder}
                             loading={loading} total={total} />}
                     </div>
 
