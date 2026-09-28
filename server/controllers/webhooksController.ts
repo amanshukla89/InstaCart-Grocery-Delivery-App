@@ -34,39 +34,41 @@ export const stripeWebhook = async (request: Request, response: Response) => {
             const paymentIntent = event.data.object as Stripe.PaymentIntent;
             const paymentIntentId = paymentIntent.id;
 
-            //getting session metadata
+            console.log("========== STRIPE WEBHOOK ==========");
+            console.log("Payment Intent:", paymentIntentId);
+
             const session = await stripe.checkout.sessions.list({
                 payment_intent: paymentIntentId
-            })
-            const { orderId } = session.data[0].metadata as any;
+            });
 
-            //Mark payment as paid
+            console.log("Sessions:", session.data);
+
+            if (!session.data.length) {
+                console.log("❌ No checkout session found");
+                return response.status(400).json({
+                    message: "Checkout session not found"
+                });
+            }
+
+            const orderId = session.data[0].metadata?.orderId;
+
+            console.log("Order ID:", orderId);
+
+            if (!orderId) {
+                console.log("❌ No orderId in metadata");
+                return response.status(400).json({
+                    message: "Order ID missing"
+                });
+            }
+
             const paidOrder = await prisma.order.update({
                 where: { id: orderId },
                 data: { isPaid: true }
-            })
+            });
 
-            //Decrease Stock
-            const orderItems = (Array.isArray(paidOrder.items)) ? paidOrder.items : [] as any[];
-            for (const item of orderItems) {
-                await prisma.product.update({
-                    where: { id: item.product },
-                    data: { stock: { decrement: item.quantity } }
-                })
-            }
+            console.log("✅ ORDER MARKED PAID:", paidOrder.id);
 
-            if (paidOrder) {
-                await inngest.send({ name: "order/placed", data: { orderId } })
-            }
-
-            //Send stock update events for each product in the order
-            for (const item of orderItems) {
-                await inngest.send({
-                    name: "inventory/stock.updated", data:
-                        { productId: item.product }
-                })
-            }
-            break;
+        // baaki code...
 
 
         case 'payment_intent.canceled':

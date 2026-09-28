@@ -39,14 +39,11 @@ const MyOrders = () => {
         if (searchParams.get("clearCart")) {
             clearCart();
             setSearchParams({});
-            setTimeout(() => {
-                fetchOrders()
-            }, 2000)
-        } else {
-            fetchOrders()
         }
 
-    }, [activeTab])
+        fetchOrders();
+    }, [activeTab, searchParams]);
+
 
     return (
         <div className="min-h-screen bg-app-cream mb-20">
