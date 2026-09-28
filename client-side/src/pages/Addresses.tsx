@@ -4,7 +4,7 @@ import { MapPinIcon, PlusIcon } from "lucide-react"
 import Loading from "../components/Loading"
 import AddressCard from "../components/AddressCard"
 import AddressForm from "../components/AddressForm"
-import { useAuth } from "../context/authContext"
+import { useAuth } from "../context/AuthContext"
 import api from "../config/api"
 import toast from "react-hot-toast"
 
