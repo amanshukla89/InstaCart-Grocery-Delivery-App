@@ -164,5 +164,5 @@ Before going live, also check that the database is reachable and that Prisma Cli
 
 Aman Shukla, full stack developer
 
-- LinkedIn: https://www.linkedin.com/in/amanshukla-775188361
+- LinkedIn:https://www.linkedin.com/in/aman-shukla-775188361/
 - GitHub: https://github.com/amanshukla89
